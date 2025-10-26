@@ -1,0 +1,641 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ==================== ROOT & VARIABLES ==================== */
+:root {
+    --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    --gradient-professional: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    --shadow-professional:
+        0 4px 20px rgba(0, 0, 0, 0.08), 0 0 1px rgba(0, 0, 0, 0.1);
+    --shadow-professional-lg:
+        0 8px 30px rgba(0, 0, 0, 0.12), 0 0 1px rgba(0, 0, 0, 0.1);
+    --blur-glass: 16px;
+}
+
+/* ==================== BASE STYLES ==================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+}
+
+body {
+    font-family:
+        "Inter",
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        "Roboto",
+        sans-serif;
+    background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
+    color: #f1f5f9;
+    overflow-x: hidden;
+    line-height: 1.6;
+}
+
+code,
+pre {
+    font-family: "Fira Code", Monaco, "Courier New", monospace;
+}
+
+/* ==================== CUSTOM SCROLLBAR ==================== */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(15, 23, 42, 0.5);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #6366f1 0%, #8b5cf6 100%);
+    border-radius: 10px;
+    border: 2px solid rgba(15, 23, 42, 0.5);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, #4f46e5 0%, #7c3aed 100%);
+}
+
+/* Firefox Scrollbar */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: #6366f1 rgba(15, 23, 42, 0.5);
+}
+
+/* ==================== PROFESSIONAL GLASSMORPHISM ==================== */
+.glass-professional {
+    background: rgba(30, 41, 59, 0.7);
+    backdrop-filter: blur(var(--blur-glass));
+    -webkit-backdrop-filter: blur(var(--blur-glass));
+    border: 1px solid rgba(99, 102, 241, 0.1);
+    box-shadow: var(--shadow-professional);
+}
+
+.glass-professional-light {
+    background: rgba(241, 245, 249, 0.1);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.glass-card {
+    background: rgba(30, 41, 59, 0.8);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(99, 102, 241, 0.2);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+/* ==================== PROFESSIONAL GRADIENTS ==================== */
+.gradient-professional {
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+}
+
+.gradient-mesh {
+    background:
+        radial-gradient(
+            at 27% 37%,
+            hsla(215, 98%, 61%, 0.2) 0px,
+            transparent 50%
+        ),
+        radial-gradient(
+            at 97% 21%,
+            hsla(125, 98%, 72%, 0.2) 0px,
+            transparent 50%
+        ),
+        radial-gradient(
+            at 52% 99%,
+            hsla(354, 98%, 61%, 0.2) 0px,
+            transparent 50%
+        ),
+        radial-gradient(
+            at 10% 29%,
+            hsla(256, 96%, 67%, 0.2) 0px,
+            transparent 50%
+        ),
+        radial-gradient(
+            at 97% 96%,
+            hsla(38, 60%, 74%, 0.2) 0px,
+            transparent 50%
+        ),
+        radial-gradient(
+            at 33% 50%,
+            hsla(222, 67%, 73%, 0.2) 0px,
+            transparent 50%
+        ),
+        radial-gradient(
+            at 79% 53%,
+            hsla(343, 68%, 79%, 0.2) 0px,
+            transparent 50%
+        );
+    animation: gradient 10s ease infinite;
+    background-size: 200% 200%;
+}
+
+.gradient-text {
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-size: 200% auto;
+    animation: gradient-text 3s ease infinite;
+}
+
+@keyframes gradient-text {
+    0%,
+    100% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+}
+
+/* ==================== PROFESSIONAL SHADOWS ==================== */
+.shadow-professional {
+    box-shadow: var(--shadow-professional);
+}
+
+.shadow-professional-lg {
+    box-shadow: var(--shadow-professional-lg);
+}
+
+.shadow-glow-primary {
+    box-shadow:
+        0 0 30px rgba(99, 102, 241, 0.3),
+        0 0 60px rgba(99, 102, 241, 0.15);
+}
+
+.shadow-glow-purple {
+    box-shadow:
+        0 0 30px rgba(139, 92, 246, 0.3),
+        0 0 60px rgba(139, 92, 246, 0.15);
+}
+
+/* ==================== PROFESSIONAL BUTTONS ==================== */
+.btn-professional {
+    @apply px-6 py-3 rounded-xl font-semibold transition-all duration-300;
+    @apply bg-gradient-to-r from-primary-500 to-primary-600;
+    @apply hover:from-primary-600 hover:to-primary-700;
+    @apply text-white shadow-lg hover:shadow-xl;
+    @apply transform hover:-translate-y-0.5 active:translate-y-0;
+    @apply focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-dark-900;
+}
+
+.btn-secondary-professional {
+    @apply px-6 py-3 rounded-xl font-semibold transition-all duration-300;
+    @apply bg-white/5 hover:bg-white/10 backdrop-blur-sm;
+    @apply text-gray-200 border border-white/10 hover:border-primary-500/50;
+    @apply shadow-md hover:shadow-lg;
+    @apply transform hover:-translate-y-0.5 active:translate-y-0;
+}
+
+.btn-ghost-professional {
+    @apply px-6 py-3 rounded-xl font-semibold transition-all duration-300;
+    @apply text-gray-300 hover:text-white hover:bg-white/5;
+    @apply border border-transparent hover:border-white/10;
+}
+
+/* ==================== PROFESSIONAL INPUTS ==================== */
+.input-professional {
+    @apply w-full px-4 py-3 rounded-xl;
+    @apply bg-white/5 border border-white/10;
+    @apply text-white placeholder-gray-400;
+    @apply focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent;
+    @apply transition-all duration-300;
+    @apply hover:bg-white/10 hover:border-primary-500/30;
+}
+
+.textarea-professional {
+    @apply w-full px-4 py-3 rounded-xl resize-none;
+    @apply bg-white/5 border border-white/10;
+    @apply text-white placeholder-gray-400;
+    @apply focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent;
+    @apply transition-all duration-300;
+    @apply hover:bg-white/10 hover:border-primary-500/30;
+}
+
+/* ==================== PROFESSIONAL CARDS ==================== */
+.card-professional {
+    @apply rounded-2xl p-6 glass-card;
+    @apply hover:shadow-professional-lg;
+    @apply transition-all duration-300;
+    @apply border border-white/10 hover:border-primary-500/30;
+}
+
+.card-interactive {
+    @apply card-professional cursor-pointer;
+    @apply transform hover:-translate-y-1 hover:scale-[1.02];
+    @apply active:scale-[0.98];
+}
+
+/* ==================== CHAT BUBBLES (Professional) ==================== */
+.chat-bubble-user-professional {
+    @apply relative rounded-2xl rounded-tr-md px-6 py-4;
+    @apply bg-gradient-to-br from-primary-500 to-primary-600;
+    @apply text-white shadow-lg;
+    @apply border border-primary-400/30;
+}
+
+.chat-bubble-ai-professional {
+    @apply relative rounded-2xl rounded-tl-md px-6 py-4;
+    @apply glass-card text-gray-100;
+    @apply border border-primary-500/20;
+    @apply shadow-professional;
+}
+
+/* ==================== TYPING INDICATOR (Professional) ==================== */
+.typing-indicator-professional {
+    @apply flex gap-2;
+}
+
+.typing-dot {
+    @apply w-2.5 h-2.5 rounded-full;
+    @apply bg-gradient-to-r from-primary-400 to-primary-600;
+    animation: typing-bounce 1.4s infinite ease-in-out;
+}
+
+.typing-dot:nth-child(1) {
+    animation-delay: -0.32s;
+}
+.typing-dot:nth-child(2) {
+    animation-delay: -0.16s;
+}
+.typing-dot:nth-child(3) {
+    animation-delay: 0s;
+}
+
+@keyframes typing-bounce {
+    0%,
+    80%,
+    100% {
+        transform: scale(0.7);
+        opacity: 0.5;
+    }
+    40% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* ==================== CODE BLOCKS (Professional) ==================== */
+.markdown-content pre {
+    @apply rounded-xl p-5 my-4 overflow-x-auto;
+    @apply bg-dark-950/90 border border-primary-500/20;
+    @apply shadow-professional;
+}
+
+.markdown-content code {
+    @apply text-sm font-mono;
+    @apply bg-primary-500/10 px-2 py-0.5 rounded-md;
+    @apply text-primary-300 border border-primary-500/20;
+}
+
+.markdown-content pre code {
+    @apply bg-transparent border-0 p-0;
+    @apply text-gray-300;
+}
+
+/* ==================== MARKDOWN STYLING (Professional) ==================== */
+.markdown-content {
+    @apply text-gray-200 leading-relaxed;
+}
+
+.markdown-content h1,
+.markdown-content h2,
+.markdown-content h3,
+.markdown-content h4,
+.markdown-content h5,
+.markdown-content h6 {
+    @apply font-bold text-white mb-4 mt-6;
+}
+
+.markdown-content h1 {
+    @apply text-3xl;
+}
+.markdown-content h2 {
+    @apply text-2xl;
+}
+.markdown-content h3 {
+    @apply text-xl;
+}
+.markdown-content h4 {
+    @apply text-lg;
+}
+
+.markdown-content p {
+    @apply mb-4 text-gray-200;
+}
+
+.markdown-content a {
+    @apply text-primary-400 hover:text-primary-300 underline;
+    @apply transition-colors duration-200;
+}
+
+.markdown-content ul,
+.markdown-content ol {
+    @apply mb-4 pl-6 space-y-2;
+}
+
+.markdown-content li {
+    @apply text-gray-200;
+}
+
+.markdown-content blockquote {
+    @apply border-l-4 border-primary-500 pl-4 py-2 my-4;
+    @apply bg-primary-500/5 rounded-r-lg;
+    @apply italic text-gray-300;
+}
+
+.markdown-content table {
+    @apply w-full my-4 border-collapse;
+}
+
+.markdown-content th,
+.markdown-content td {
+    @apply border border-white/10 px-4 py-2;
+}
+
+.markdown-content th {
+    @apply bg-primary-500/20 font-semibold text-white;
+}
+
+.markdown-content tr:hover {
+    @apply bg-white/5;
+}
+
+.markdown-content img {
+    @apply rounded-xl shadow-professional my-4;
+}
+
+.markdown-content hr {
+    @apply border-white/10 my-6;
+}
+
+/* ==================== BADGES & TAGS (Professional) ==================== */
+.badge-professional {
+    @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold;
+    @apply bg-primary-500/20 text-primary-300 border border-primary-500/30;
+}
+
+.tag-professional {
+    @apply inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium;
+    @apply bg-white/5 text-gray-300 border border-white/10;
+    @apply hover:bg-white/10 hover:border-primary-500/30;
+    @apply transition-all duration-200;
+}
+
+/* ==================== TOOLTIPS (Professional) ==================== */
+.tooltip-professional {
+    @apply absolute z-50 px-3 py-2 rounded-lg text-sm font-medium;
+    @apply bg-dark-800 text-white border border-white/10;
+    @apply shadow-professional-lg;
+    @apply pointer-events-none opacity-0;
+    @apply transition-opacity duration-200;
+}
+
+.tooltip-professional.show {
+    @apply opacity-100;
+}
+
+/* ==================== MODALS (Professional) ==================== */
+.modal-backdrop {
+    @apply fixed inset-0 bg-black/60 backdrop-blur-md z-50;
+    @apply flex items-center justify-center p-4;
+    animation: fadeIn 0.2s ease-out;
+}
+
+.modal-content {
+    @apply glass-card rounded-3xl p-8 max-w-2xl w-full;
+    @apply border-2 border-primary-500/20;
+    @apply shadow-professional-lg;
+    animation: scaleIn 0.3s ease-out;
+}
+
+@keyframes scaleIn {
+    0% {
+        transform: scale(0.95);
+        opacity: 0;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* ==================== LOADING STATES (Professional) ==================== */
+.shimmer-professional {
+    @apply relative overflow-hidden;
+}
+
+.shimmer-professional::after {
+    content: "";
+    @apply absolute inset-0;
+    @apply bg-gradient-to-r from-transparent via-white/10 to-transparent;
+    animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+    0% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+.pulse-professional {
+    animation: pulse-professional 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse-professional {
+    0%,
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.8;
+        transform: scale(1.02);
+    }
+}
+
+/* ==================== DIVIDERS (Professional) ==================== */
+.divider-professional {
+    @apply h-px bg-gradient-to-r from-transparent via-white/10 to-transparent;
+}
+
+.divider-vertical-professional {
+    @apply w-px bg-gradient-to-b from-transparent via-white/10 to-transparent;
+}
+
+/* ==================== AVATARS (Professional) ==================== */
+.avatar-professional {
+    @apply w-10 h-10 rounded-xl flex items-center justify-center;
+    @apply bg-gradient-to-br from-primary-500 to-primary-600;
+    @apply text-white font-semibold shadow-lg;
+    @apply border-2 border-primary-400/30;
+}
+
+.avatar-ai-professional {
+    @apply w-10 h-10 rounded-xl flex items-center justify-center;
+    @apply bg-gradient-to-br from-purple-500 to-pink-500;
+    @apply text-white shadow-glow-purple;
+    @apply border-2 border-purple-400/30;
+}
+
+/* ==================== SELECTION ==================== */
+::selection {
+    @apply bg-primary-500/30 text-white;
+}
+
+::-moz-selection {
+    @apply bg-primary-500/30 text-white;
+}
+
+/* ==================== FOCUS VISIBLE ==================== */
+*:focus-visible {
+    @apply outline-none ring-2 ring-primary-500 ring-offset-2 ring-offset-dark-900;
+}
+
+/* ==================== ANIMATIONS ==================== */
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeInUp {
+    0% {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInRight {
+    0% {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes gradient {
+    0%,
+    100% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+}
+
+@keyframes float {
+    0%,
+    100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-20px);
+    }
+}
+
+@keyframes glow {
+    0%,
+    100% {
+        box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+    }
+    50% {
+        box-shadow: 0 0 40px rgba(99, 102, 241, 0.6);
+    }
+}
+
+/* ==================== UTILITY CLASSES ==================== */
+.text-gradient {
+    @apply bg-gradient-to-r from-primary-400 via-purple-400 to-pink-400;
+    @apply bg-clip-text text-transparent;
+}
+
+.border-gradient {
+    border: 1px solid transparent;
+    background-image:
+        linear-gradient(#1e293b, #1e293b),
+        linear-gradient(135deg, #6366f1, #8b5cf6);
+    background-origin: border-box;
+    background-clip: padding-box, border-box;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+.no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+/* ==================== RESPONSIVE UTILITIES ==================== */
+@media (max-width: 768px) {
+    .glass-professional,
+    .glass-card {
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+    }
+
+    .chat-bubble-user-professional,
+    .chat-bubble-ai-professional {
+        @apply px-4 py-3;
+    }
+}
+
+/* ==================== PERFORMANCE OPTIMIZATIONS ==================== */
+.will-change-transform {
+    will-change: transform;
+}
+
+.will-change-opacity {
+    will-change: opacity;
+}
+
+.gpu-accelerated {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+}
+
+/* ==================== PRINT STYLES ==================== */
+@media print {
+    .no-print {
+        display: none !important;
+    }
+
+    body {
+        background: white;
+        color: black;
+    }
+}

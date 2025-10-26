@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fix 400 Error - Groq AI Chat</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            width: 100%;
+            padding: 40px;
+        }
+
+        h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 8px 16px;
+            background: #10b981;
+            color: white;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .section {
+            margin: 20px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .section h2 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 20px;
+        }
+
+        .section p {
+            line-height: 1.6;
+            color: #555;
+            margin-bottom: 10px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .log {
+            background: #1e293b;
+            color: #10b981;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .log.show {
+            display: block;
+        }
+
+        .log-line {
+            margin: 5px 0;
+        }
+
+        .warning {
+            background: #fff3cd;
+            border-left-color: #ffc107;
+            color: #856404;
+        }
+
+        .success {
+            background: #d1e7dd;
+            border-left-color: #10b981;
+            color: #0f5132;
+        }
+
+        .error {
+            background: #f8d7da;
+            border-left-color: #dc3545;
+            color: #721c24;
+        }
+
+        code {
+            background: #e9ecef;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            color: #d63384;
+        }
+
+        .footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e9ecef;
+            text-align: center;
+            color: #6c757d;
+            font-size: 14px;
+        }
+
+        .icon {
+            display: inline-block;
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Fix 400 Bad Request Error</h1>
+        <div class="status">✅ Auto-Fix Available</div>
+
+        <div class="section">
+            <h2>🐛 What's Wrong?</h2>
+            <p>Your app is trying to use an invalid model name like <code>grok-beta</code> which doesn't exist in Groq API.</p>
+            <p><strong>Solution:</strong> We'll automatically migrate all conversations to use <code>llama-3.1-8b-instant</code> (the correct model).</p>
+        </div>
+
+        <div class="section warning">
+            <h2>⚠️ Before You Fix</h2>
+            <p>This will update your saved conversations. The fix is safe, but you can backup first if you want.</p>
+        </div>
+
+        <div class="button-group">
+            <button class="btn-primary" onclick="fixConversations()">
+                <span class="icon">🔧</span> Auto-Fix Now
+            </button>
+            <button class="btn-secondary" onclick="backupData()">
+                <span class="icon">💾</span> Backup First
+            </button>
+            <button class="btn-danger" onclick="clearAll()">
+                <span class="icon">🗑️</span> Clear All & Start Fresh
+            </button>
+        </div>
+
+        <div id="log" class="log"></div>
+
+        <div class="section success" id="successMsg" style="display: none;">
+            <h2>✅ Fixed Successfully!</h2>
+            <p>All conversations have been migrated to use valid Groq models.</p>
+            <p><strong>Next step:</strong> Close this page and reload your app. Everything should work now!</p>
+        </div>
+
+        <div class="section">
+            <h2>📋 Manual Fix (Advanced)</h2>
+            <p>If auto-fix doesn't work, open browser console (F12) and run:</p>
+            <code style="display: block; margin-top: 10px; padding: 10px;">
+localStorage.removeItem('grok_conversations');<br>
+localStorage.removeItem('grok_last_conversation');<br>
+location.reload();
+            </code>
+        </div>
+
+        <div class="footer">
+            <p>🚀 Groq AI Chat - Ultra-Fast AI Inference</p>
+            <p>For more help, check <strong>TROUBLESHOOTING_400.md</strong></p>
+        </div>
+    </div>
+
+    <script>
+        const log = document.getElementById('log');
+        const successMsg = document.getElementById('successMsg');
+
+        function addLog(message, type = 'info') {
+            log.classList.add('show');
+            const line = document.createElement('div');
+            line.className = 'log-line';
+
+            const timestamp = new Date().toLocaleTimeString();
+            const icon = type === 'success' ? '✅' : type === 'error' ? '❌' : '🔍';
+
+            line.textContent = `[${timestamp}] ${icon} ${message}`;
+            log.appendChild(line);
+            log.scrollTop = log.scrollHeight;
+        }
+
+        function fixConversations() {
+            addLog('Starting auto-fix process...');
+
+            try {
+                // Get saved conversations
+                const savedConvs = localStorage.getItem('grok_conversations');
+
+                if (!savedConvs) {
+                    addLog('No conversations found. Nothing to fix!', 'success');
+                    successMsg.style.display = 'block';
+                    return;
+                }
+
+                addLog('Found saved conversations. Parsing...');
+                const conversations = JSON.parse(savedConvs);
+                addLog(`Processing ${conversations.length} conversation(s)...`);
+
+                // Valid Groq models
+                const validModels = [
+                    'llama-3.1-8b-instant',
+                    'llama-3.1-70b-versatile',
+                    'llama-3.2-1b-preview',
+                    'llama-3.2-3b-preview',
+                    'llama-3.2-11b-vision-preview',
+                    'llama-3.2-90b-vision-preview',
+                    'mixtral-8x7b-32768',
+                    'gemma2-9b-it'
+                ];
+
+                let fixedCount = 0;
+
+                // Fix each conversation
+                const fixed = conversations.map(conv => {
+                    if (conv.settings && !validModels.includes(conv.settings.model)) {
+                        addLog(`Migrating "${conv.title}" from "${conv.settings.model}" to "llama-3.1-8b-instant"`);
+                        fixedCount++;
+                        return {
+                            ...conv,
+                            settings: {
+                                ...conv.settings,
+                                model: 'llama-3.1-8b-instant'
+                            }
+                        };
+                    }
+                    return conv;
+                });
+
+                // Save back
+                localStorage.setItem('grok_conversations', JSON.stringify(fixed));
+
+                addLog(`Fixed ${fixedCount} conversation(s)!`, 'success');
+                addLog('Saved to localStorage', 'success');
+
+                successMsg.style.display = 'block';
+
+                setTimeout(() => {
+                    addLog('You can now close this page and reload your app!', 'success');
+                }, 500);
+
+            } catch (error) {
+                addLog(`Error: ${error.message}`, 'error');
+                addLog('Try using "Clear All & Start Fresh" instead', 'error');
+            }
+        }
+
+        function backupData() {
+            addLog('Creating backup...');
+
+            try {
+                const conversations = localStorage.getItem('grok_conversations');
+
+                if (!conversations) {
+                    addLog('No data to backup!', 'error');
+                    return;
+                }
+
+                const blob = new Blob([conversations], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `groq-chat-backup-${Date.now()}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+
+                addLog('Backup saved successfully!', 'success');
+                addLog('You can now click "Auto-Fix Now"', 'success');
+
+            } catch (error) {
+                addLog(`Backup failed: ${error.message}`, 'error');
+            }
+        }
+
+        function clearAll() {
+            if (!confirm('⚠️ This will delete ALL conversations and settings. Are you sure?')) {
+                return;
+            }
+
+            addLog('Clearing all data...');
+
+            try {
+                localStorage.removeItem('grok_conversations');
+                localStorage.removeItem('grok_last_conversation');
+                localStorage.removeItem('groq_api_key');
+
+                addLog('Cleared conversations', 'success');
+                addLog('Cleared last conversation ID', 'success');
+                addLog('Cleared API key', 'success');
+
+                successMsg.style.display = 'block';
+
+                setTimeout(() => {
+                    addLog('All clear! Reload your app to start fresh.', 'success');
+                }, 500);
+
+            } catch (error) {
+                addLog(`Error: ${error.message}`, 'error');
+            }
+        }
+
+        // Auto-check on load
+        window.addEventListener('load', () => {
+            const convs = localStorage.getItem('grok_conversations');
+            if (convs) {
+                try {
+                    const parsed = JSON.parse(convs);
+                    const count = parsed.length;
+                    addLog(`Found ${count} conversation(s) in storage`);
+
+                    const invalidCount = parsed.filter(c => {
+                        const validModels = [
+                            'llama-3.1-8b-instant',
+                            'llama-3.1-70b-versatile',
+                            'llama-3.2-1b-preview',
+                            'llama-3.2-3b-preview',
+                            'llama-3.2-11b-vision-preview',
+                            'llama-3.2-90b-vision-preview',
+                            'mixtral-8x7b-32768',
+                            'gemma2-9b-it'
+                        ];
+                        return c.settings && !validModels.includes(c.settings.model);
+                    }).length;
+
+                    if (invalidCount > 0) {
+                        addLog(`⚠️ Found ${invalidCount} conversation(s) with invalid models`);
+                        addLog('Click "Auto-Fix Now" to fix them');
+                    } else {
+                        addLog('✅ All conversations have valid models!', 'success');
+                    }
+                } catch (e) {
+                    addLog('Error reading conversations', 'error');
+                }
+            } else {
+                addLog('No saved conversations found');
+            }
+        });
+    </script>
+</body>
+</html>

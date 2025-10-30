@@ -27,9 +27,9 @@ export interface ConversationSettings {
 }
 
 class GrokAPIService {
-  private apiKey: string = '';
-  private baseURL: string = 'https://api.x.ai/v1';
-  private defaultModel: string = 'grok-beta';
+  private apiKey: string = (import.meta as any).env?.VITE_GROK_API_KEY || '';
+  private baseURL: string = (import.meta as any).env?.VITE_GROK_BASE_URL || 'https://api.x.ai/v1';
+  private defaultModel: string = (import.meta as any).env?.VITE_GROK_DEFAULT_MODEL || 'grok-beta';
 
   setApiKey(key: string) {
     this.apiKey = key;

@@ -28,9 +28,10 @@ export interface ConversationSettings {
 
 class GroqAPIService {
   private apiKey: string =
+    (import.meta as any).env?.VITE_GROQ_API_KEY ||
     "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";
-  private baseURL: string = "https://api.groq.com/openai/v1";
-  private defaultModel: string = "llama-3.1-8b-instant";
+  private baseURL: string = (import.meta as any).env?.VITE_GROQ_BASE_URL || "https://api.groq.com/openai/v1";
+  private defaultModel: string = (import.meta as any).env?.VITE_GROQ_DEFAULT_MODEL || "llama-3.1-8b-instant";
 
   setApiKey(key: string) {
     // API key is hardcoded, this method is kept for compatibility

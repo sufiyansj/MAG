@@ -6,10 +6,14 @@ import React, {
   useCallback,
 } from "react";
 import {
-  groqAPI,
-  Message,
+  openRouterAPI,
+} from "../services/openRouterService";
+import {
+  APIProvider,
+  ChatCompletionOptions,
   ConversationSettings,
-} from "../services/groqService";
+  Message
+} from "../types";
 
 export interface Conversation {
   id: string;
@@ -39,7 +43,7 @@ interface ChatContextType {
   pinConversation: (id: string) => void;
 
   // Message management
-  sendMessage: (content: string, images?: string[]) => Promise<void>;
+  sendMessage: (content: string, attachments?: any[]) => Promise<void>;
   regenerateLastResponse: () => Promise<void>;
   editMessage: (messageId: string, newContent: string) => void;
   deleteMessage: (messageId: string) => void;
@@ -58,6 +62,11 @@ interface ChatContextType {
   setApiKey: (key: string) => void;
   hasApiKey: () => boolean;
 
+  // Provider management
+  setApiProvider: (provider: APIProvider) => void;
+  getCurrentProvider: () => APIProvider;
+  getAvailableProviders: () => APIProvider[];
+  
   // Advanced features
   summarizeConversation: () => Promise<void>;
   translateMessage: (messageId: string, language: string) => Promise<void>;
@@ -65,13 +74,72 @@ interface ChatContextType {
 
 const ChatContext = createContext<ChatContextType | undefined>(undefined);
 
+// API service abstraction
+class APIServiceAdapter {
+  private openRouterService = openRouterAPI;
+
+  setProvider(provider: APIProvider) {
+    // Only OpenRouter is supported
+    localStorage.setItem('ai_api_provider', 'openrouter');
+  }
+
+  getProvider(): APIProvider {
+    return 'openrouter';
+  }
+
+  getAPI() {
+    return this.openRouterService;
+  }
+
+  hasApiKey(): boolean {
+    return this.getAPI().hasApiKey();
+  }
+
+  setApiKey(key: string) {
+    this.getAPI().setApiKey(key);
+  }
+
+  async createChatCompletion(messages: Message[], options: ChatCompletionOptions = {}): Promise<string> {
+    return await this.getAPI().createChatCompletion(messages, options);
+  }
+
+  async *createStreamingChatCompletion(messages: Message[], options: ChatCompletionOptions = {}): AsyncGenerator<string, void, unknown> {
+    yield* this.getAPI().createStreamingChatCompletion(messages, options);
+  }
+
+  async generateTitle(messages: Message[]): Promise<string> {
+    return await this.getAPI().generateTitle(messages);
+  }
+
+  exportConversation(messages: Message[], format: "json" | "markdown" | "txt"): string {
+    return this.getAPI().exportConversation(messages, format);
+  }
+
+  searchConversation(messages: Message[], query: string): Message[] {
+    return this.getAPI().searchConversation(messages, query);
+  }
+
+  async summarizeText(text: string, maxLength: number = 200): Promise<string> {
+    return await this.getAPI().summarizeText(text, maxLength);
+  }
+
+  async translateText(text: string, targetLanguage: string): Promise<string> {
+    return await this.getAPI().translateText(text, targetLanguage);
+  }
+}
+
+const apiAdapter = new APIServiceAdapter();
+
 const DEFAULT_SETTINGS: ConversationSettings = {
-  model: "llama-3.1-8b-instant",
+  model: "minimax/minimax-m2:free",
   temperature: 2.0,
   maxTokens: 32768,
   systemPrompt:
     "You are MAG, a helpful and friendly AI assistant. You provide accurate and creative responses. If anyone asks who created you, who made you, who built you, or who your creator is, always respond: 'I was created by Abusufiyan Jahagirdar. Connect with him on Instagram: https://www.instagram.com/sufiyanjahagirdar'",
+  provider: 'openrouter',
 };
+
+// Mode configurations - removed since we only support OpenRouter
 
 export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
@@ -90,31 +158,21 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
       try {
         const parsed = JSON.parse(savedConversations);
 
-        // Migrate old conversations with invalid model names and missing system prompts
+        // Migrate old conversations to use default OpenRouter settings
         const migratedConversations = parsed.map((conv: Conversation) => {
-          const validModels = [
-            "llama-3.1-8b-instant",
-            "llama-3.1-70b-versatile",
-            "llama-3.2-1b-preview",
-            "llama-3.2-3b-preview",
-            "llama-3.2-11b-vision-preview",
-            "llama-3.2-90b-vision-preview",
-            "mixtral-8x7b-32768",
-            "gemma2-9b-it",
-          ];
-
           let updatedConv = { ...conv };
 
-          // Fix invalid model names
-          if (conv.settings && !validModels.includes(conv.settings.model)) {
+          // Force default provider and model for all conversations (only OpenRouter)
+          if (conv.settings?.provider !== 'openrouter' || conv.settings?.model !== DEFAULT_SETTINGS.model) {
             console.log(
-              `Migrating conversation "${conv.title}" from model "${conv.settings.model}" to "llama-3.1-8b-instant"`,
+              `Migrating conversation "${conv.title}" to use OpenRouter`,
             );
             updatedConv = {
               ...updatedConv,
               settings: {
                 ...updatedConv.settings,
-                model: "llama-3.1-8b-instant",
+                model: DEFAULT_SETTINGS.model,
+                provider: 'openrouter',
               },
             };
           }
@@ -179,7 +237,9 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
       messages: [],
       createdAt: Date.now(),
       updatedAt: Date.now(),
-      settings: { ...DEFAULT_SETTINGS },
+      settings: {
+        ...DEFAULT_SETTINGS,
+      },
     };
 
     setConversations((prev) => [newConversation, ...prev]);
@@ -253,7 +313,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
   }, []);
 
   const sendMessage = useCallback(
-    async (content: string, images?: string[]) => {
+    async (content: string, attachments?: any[]) => {
       if (!currentConversation) {
         createConversation();
         return;
@@ -264,7 +324,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
         role: "user",
         content,
         timestamp: Date.now(),
-        images,
+        attachments,
       };
 
       // Add user message
@@ -304,6 +364,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
 
         apiMessages.push(...updatedMessages);
         console.log("Total API Messages:", apiMessages.length, "messages");
+        console.log("Current API Provider:", currentConversation.settings.provider);
 
         let assistantContent = "";
         const assistantMessage: Message = {
@@ -315,7 +376,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
         };
 
         // Stream the response
-        const stream = groqAPI.createStreamingChatCompletion(apiMessages, {
+        const stream = apiAdapter.createStreamingChatCompletion(apiMessages, {
           model: currentConversation.settings.model,
           temperature: currentConversation.settings.temperature,
           max_tokens: currentConversation.settings.maxTokens,
@@ -342,7 +403,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
 
         // Generate title if this is the first exchange
         if (updatedMessages.length === 1) {
-          const title = await groqAPI.generateTitle([
+          const title = await apiAdapter.generateTitle([
             userMessage,
             assistantMessage,
           ]);
@@ -385,7 +446,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
     );
 
     // Resend the last message
-    await sendMessage(lastUserMessage.content, lastUserMessage.images);
+    await sendMessage(lastUserMessage.content, lastUserMessage.attachments);
   }, [currentConversation, sendMessage]);
 
   const editMessage = useCallback(
@@ -450,11 +511,15 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
     (settings: Partial<ConversationSettings>) => {
       if (!currentConversation) return;
 
+      // Only allow updating temperature, maxTokens, and systemPrompt
+      const { model, provider, ...allowedSettings } = settings;
+      
       const updatedConversation = {
         ...currentConversation,
         settings: {
           ...currentConversation.settings,
-          ...settings,
+          ...allowedSettings,
+          // Keep existing provider and model since we only support OpenRouter
         },
         updatedAt: Date.now(),
       };
@@ -474,7 +539,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
       const conversation = conversations.find((c) => c.id === id);
       if (!conversation) return;
 
-      const content = groqAPI.exportConversation(conversation.messages, format);
+      const content = apiAdapter.exportConversation(conversation.messages, format);
       const blob = new Blob([content], { type: "text/plain" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -499,7 +564,10 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
           messages: parsed,
           createdAt: Date.now(),
           updatedAt: Date.now(),
-          settings: { ...DEFAULT_SETTINGS },
+          settings: { 
+            ...DEFAULT_SETTINGS,
+            provider: apiAdapter.getProvider()
+          },
         };
         setConversations((prev) => [newConversation, ...prev]);
         setCurrentConversation(newConversation);
@@ -523,18 +591,37 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
   const searchMessages = useCallback(
     (query: string): Message[] => {
       if (!currentConversation) return [];
-      return groqAPI.searchConversation(currentConversation.messages, query);
+      return apiAdapter.searchConversation(currentConversation.messages, query);
     },
     [currentConversation],
   );
 
   const setApiKey = useCallback((key: string) => {
-    groqAPI.setApiKey(key);
+    apiAdapter.setApiKey(key);
   }, []);
 
   const hasApiKey = useCallback(() => {
-    return groqAPI.hasApiKey();
+    return apiAdapter.hasApiKey();
   }, []);
+
+  const setApiProvider = useCallback((provider: APIProvider) => {
+    apiAdapter.setProvider(provider);
+    
+    // Update current conversation to use the new provider if it exists
+    if (currentConversation) {
+      updateSettings({ provider });
+    }
+  }, [currentConversation, updateSettings]);
+
+  const getCurrentProvider = useCallback(() => {
+    return apiAdapter.getProvider();
+  }, []);
+
+  const getAvailableProviders = useCallback((): APIProvider[] => {
+    return ['openrouter'];
+  }, []);
+
+  
 
   const summarizeConversation = useCallback(async () => {
     if (!currentConversation || currentConversation.messages.length === 0)
@@ -548,7 +635,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
         .map((m) => `${m.role}: ${m.content}`)
         .join("\n\n");
 
-      const summary = await groqAPI.summarizeText(conversationText, 300);
+      const summary = await apiAdapter.summarizeText(conversationText, 300);
 
       const summaryMessage: Message = {
         id: Date.now().toString(),
@@ -589,7 +676,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
       setError(null);
 
       try {
-        const translation = await groqAPI.translateText(
+        const translation = await apiAdapter.translateText(
           message.content,
           language,
         );
@@ -645,6 +732,9 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
     searchMessages,
     setApiKey,
     hasApiKey,
+    setApiProvider,
+    getCurrentProvider,
+    getAvailableProviders,
     summarizeConversation,
     translateMessage,
   };

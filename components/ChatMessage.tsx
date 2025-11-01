@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useSpring, animated } from "@react-spring/web";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { Message } from "../services/groqService";
+import { Message } from "../types";
 
 interface ChatMessageProps {
   message: Message;
@@ -87,7 +87,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
   return (
     <animated.div
       style={springProps}
-      className={`flex gap-4 px-6 py-6 ${
+      className={`flex gap-2 sm:gap-3 lg:gap-4 px-2 sm:px-4 lg:px-6 py-4 sm:py-6 ${
         isUser ? "flex-row-reverse" : "flex-row"
       } group relative`}
       onMouseEnter={() => {
@@ -102,7 +102,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
       {/* Avatar with CSS animation */}
       <div
         ref={avatarRef}
-        className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center font-bold text-white animate-fade-in ${
+        className={`flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center font-bold text-white animate-fade-in ${
           isUser
             ? "bg-gradient-to-br from-primary-500 to-purple-600 anime-glow"
             : "bg-gradient-to-br from-anime-cyan to-anime-blue anime-glow-pink"
@@ -110,7 +110,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
         style={{ animationDuration: "0.8s" }}
       >
         {isUser ? (
-          <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+          <svg className="w-4 h-4 sm:w-6 sm:h-6" fill="currentColor" viewBox="0 0 20 20">
             <path
               fillRule="evenodd"
               d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
@@ -118,7 +118,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
             />
           </svg>
         ) : (
-          <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+          <svg className="w-4 h-4 sm:w-6 sm:h-6" fill="currentColor" viewBox="0 0 20 20">
             <path d="M2 5a2 2 0 012-2h7a2 2 0 012 2v4a2 2 0 01-2 2H9l-3 3v-3H4a2 2 0 01-2-2V5z" />
             <path d="M15 7v2a4 4 0 01-4 4H9.828l-1.766 1.767c.28.149.599.233.938.233h2l3 3v-3h2a2 2 0 002-2V9a2 2 0 00-2-2h-1z" />
           </svg>
@@ -128,18 +128,18 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
       {/* Message Content */}
       <animated.div
         style={hoverSpring}
-        className={`flex-1 max-w-3xl ${
+        className={`flex-1 max-w-[calc(100vw-120px)] sm:max-w-3xl ${
           isUser ? "chat-bubble-user" : "chat-bubble-ai"
         } transition-all duration-300`}
       >
         {/* Header */}
-        <div className="flex items-center justify-between mb-2">
-          <div className="flex items-center gap-2">
-            <span className="font-semibold text-sm">
+        <div className="flex items-center justify-between mb-1 sm:mb-2">
+          <div className="flex items-center gap-1 sm:gap-2">
+            <span className="font-semibold text-xs sm:text-sm">
               {isUser ? "You" : "MAG AI"}
             </span>
           </div>
-          <span className="text-xs opacity-60">
+          <span className="text-xs opacity-60 hidden sm:block">
             {formatTime(message.timestamp)}
           </span>
         </div>
@@ -235,16 +235,82 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
           </div>
         )}
 
-        {/* Images if any */}
-        {message.images && message.images.length > 0 && (
-          <div className="mt-4 grid grid-cols-2 gap-2">
-            {message.images.map((img, idx) => (
-              <img
-                key={idx}
-                src={img}
-                alt={`Attachment ${idx + 1}`}
-                className="rounded-lg max-h-48 object-cover"
-              />
+        {/* Attachments if any */}
+        {message.attachments && message.attachments.length > 0 && (
+          <div className="mt-4 space-y-2">
+            {message.attachments.map((attachment) => (
+              <div key={attachment.id} className="p-3 bg-white/5 border border-white/10 rounded-lg">
+                <div className="flex items-center gap-3">
+                  {/* File Icon */}
+                  <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-primary-500/20 flex items-center justify-center text-primary-400">
+                    {attachment.type.startsWith("image/") ? (
+                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path
+                          fillRule="evenodd"
+                          d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    ) : attachment.type === "application/pdf" ? (
+                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path
+                          fillRule="evenodd"
+                          d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    ) : (
+                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path
+                          fillRule="evenodd"
+                          d="M8 4a3 3 0 00-3 3v4a5 5 0 0010 0V7a1 1 0 112 0v4a7 7 0 11-14 0V7a5 5 0 0110 0v4a3 3 0 11-6 0V7a1 1 0 012 0v4a1 1 0 102 0V7a3 3 0 00-3-3z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    )}
+                  </div>
+                  
+                  {/* File Info */}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-white truncate">
+                      {attachment.name}
+                    </p>
+                    <p className="text-xs text-gray-400">
+                      {attachment.type} • {(attachment.size / 1024 / 1024).toFixed(2)} MB
+                    </p>
+                  </div>
+                  
+                  {/* Download/Preview Button */}
+                  <a
+                    href={attachment.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-shrink-0 p-2 hover:bg-white/10 rounded-lg transition-colors"
+                    title="Open file"
+                  >
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path
+                        fillRule="evenodd"
+                        d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V4a2 2 0 00-2-2H6zm1 2a1 1 0 000 2h6a1 1 0 100-2H7zm6 7a1 1 0 011 1v3a1 1 0 11-2 0v-3a1 1 0 011-1zm-3 3a1 1 0 100 2h.01a1 1 0 100-2H10zm-4 1a1 1 0 011-1h.01a1 1 0 110 2H7a1 1 0 01-1-1zm1-4a1 1 0 100 2h.01a1 1 0 100-2H7zm2 0a1 1 0 100 2h.01a1 1 0 100-2H9zm2 0a1 1 0 100 2h.01a1 1 0 100-2H11z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </a>
+                </div>
+                
+                {/* Image Preview */}
+                {attachment.type.startsWith("image/") && (
+                  <div className="mt-3">
+                    <img
+                      src={attachment.previewUrl || attachment.url}
+                      alt={attachment.name}
+                      className="rounded-lg max-h-32 sm:max-h-48 lg:max-h-64 object-cover w-full"
+                      style={{ maxWidth: '100%', height: 'auto' }}
+                      loading="lazy"
+                    />
+                  </div>
+                )}
+              </div>
             ))}
           </div>
         )}
@@ -254,12 +320,12 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
       {showActions && !isEditing && (
         <div
           className={`absolute ${
-            isUser ? "right-6" : "left-6"
+            isUser ? "right-2 sm:right-6" : "left-2 sm:left-6"
           } bottom-2 flex gap-1 bg-dark-800/90 backdrop-blur-sm rounded-lg p-1 shadow-xl animate-fade-in`}
         >
           <button
             onClick={handleCopy}
-            className="copy-icon p-2 hover:bg-white/10 rounded-md transition-colors group/btn"
+            className="copy-icon p-2 hover:bg-white/10 rounded-md transition-colors group/btn min-h-[36px] min-w-[36px] flex items-center justify-center"
             title="Copy"
           >
             {isCopied ? (
@@ -285,7 +351,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
           {isUser && onEdit && (
             <button
               onClick={handleEdit}
-              className="p-2 hover:bg-white/10 rounded-md transition-colors"
+              className="p-2 hover:bg-white/10 rounded-md transition-colors min-h-[36px] min-w-[36px] flex items-center justify-center"
               title="Edit"
             >
               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -297,7 +363,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
           {isAssistant && onRegenerate && (
             <button
               onClick={onRegenerate}
-              className="p-2 hover:bg-white/10 rounded-md transition-colors"
+              className="p-2 hover:bg-white/10 rounded-md transition-colors min-h-[36px] min-w-[36px] flex items-center justify-center"
               title="Regenerate"
             >
               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -313,7 +379,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
           {onTranslate && (
             <button
               onClick={() => onTranslate(message.id)}
-              className="p-2 hover:bg-white/10 rounded-md transition-colors"
+              className="p-2 hover:bg-white/10 rounded-md transition-colors min-h-[36px] min-w-[36px] flex items-center justify-center"
               title="Translate"
             >
               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -329,7 +395,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
           {onDelete && (
             <button
               onClick={() => onDelete(message.id)}
-              className="p-2 hover:bg-red-500/20 text-red-400 rounded-md transition-colors"
+              className="p-2 hover:bg-red-500/20 text-red-400 rounded-md transition-colors min-h-[36px] min-w-[36px] flex items-center justify-center"
               title="Delete"
             >
               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">

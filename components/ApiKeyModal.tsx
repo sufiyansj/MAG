@@ -15,7 +15,8 @@ const ApiKeyModal: React.FC<ApiKeyModalProps> = ({
 
   useEffect(() => {
     if (isOpen) {
-      const savedKey = localStorage.getItem('GROQ_API_KEY');
+      // Use the same key as openRouterService.ts
+      const savedKey = localStorage.getItem('openrouter_api_key');
       if (savedKey) {
         setApiKey(savedKey);
       }
@@ -43,7 +44,7 @@ const ApiKeyModal: React.FC<ApiKeyModalProps> = ({
             id="api-key-modal-title"
             className="text-xl font-bold text-gray-900 dark:text-white"
           >
-            Groq API Key
+            OpenRouter API Key
           </h2>
           {onClose && (
             <button onClick={onClose} aria-label="Close">
@@ -64,25 +65,25 @@ const ApiKeyModal: React.FC<ApiKeyModalProps> = ({
           )}
         </div>
         <p className="text-gray-600 dark:text-gray-300 mb-4 text-sm">
-          Please enter your Groq API key to continue. Your key will be stored
+          Please enter your OpenRouter API key to continue. Your key will be stored
           securely in your browser's local storage.
         </p>
         <input
           type="password"
           value={apiKey}
           onChange={(e) => setApiKey(e.target.value)}
-          placeholder="gsk_..."
+          placeholder="sk-or-..."
           className="w-full p-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:outline-none bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
         />
         <p className="text-xs text-gray-500 mt-2">
           You can get your key from the{' '}
           <a
-            href="https://console.groq.com/keys"
+            href="https://openrouter.ai/keys"
             target="_blank"
             rel="noopener noreferrer"
             className="text-blue-500 hover:underline"
           >
-            Groq Console
+            OpenRouter Console
           </a>
           .
         </p>

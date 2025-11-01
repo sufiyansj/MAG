@@ -2,6 +2,9 @@ import React, { useState, useEffect, useRef } from "react";
 import { useSpring, animated, useTrail } from "@react-spring/web";
 import { ChatProvider, useChat } from "./contexts/ChatContext";
 import ChatMessage from "./components/ChatMessage";
+import ChatInput from "./components/ChatInput";
+import ApiKeyModal from "./components/ApiKeyModal";
+import ApiKeyPrompt from "./components/ApiKeyPrompt";
 import "./index.css";
 
 // Sidebar Component
@@ -47,7 +50,7 @@ const Sidebar: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
       {/* Sidebar */}
       <animated.div
         style={sidebarSpring}
-        className="fixed lg:relative top-0 left-0 h-full w-80 bg-gradient-to-br from-dark-900 via-dark-800 to-dark-900 border-r border-white/10 z-50 flex flex-col lg:translate-x-0"
+        className="fixed lg:relative top-0 left-0 h-full w-80 lg:w-80 md:w-72 sm:w-72 xs:w-80 bg-gradient-to-br from-dark-900 via-dark-800 to-dark-900 border-r border-white/10 z-50 flex flex-col lg:translate-x-0"
       >
         {/* Header */}
         <div className="p-4 border-b border-white/10">
@@ -209,7 +212,7 @@ const ConversationItem: React.FC<{
   onSelect: () => void;
   onDelete: () => void;
   onRename: (title: string) => void;
-  onExport: (format: "json" | "markdown" | "txt") => void;
+  onExport: (format: "json" | "txt") => void;
 }> = ({ conversation, isActive, onSelect, onDelete, onRename, onExport }) => {
   const [showMenu, setShowMenu] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -305,12 +308,12 @@ const ConversationItem: React.FC<{
           </button>
           <button
             onClick={() => {
-              onExport("markdown");
+              onExport("txt");
               setShowMenu(false);
             }}
             className="w-full px-4 py-2 text-left text-sm hover:bg-white/5 transition-colors"
           >
-            Export as Markdown
+            Export as TXT
           </button>
           <button
             onClick={() => {
@@ -327,7 +330,7 @@ const ConversationItem: React.FC<{
   );
 };
 
-// Settings Modal
+
 
 // Main Chat Interface
 const ChatInterface: React.FC = () => {
@@ -338,11 +341,20 @@ const ChatInterface: React.FC = () => {
     regenerateLastResponse,
     editMessage,
     deleteMessage,
+    hasApiKey,
+    setApiKey
   } = useChat();
-  const [input, setInput] = useState("");
-  const [isTyping, setIsTyping] = useState(false);
+  const [showApiKeyPrompt, setShowApiKeyPrompt] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLTextAreaElement>(null);
+
+  // Check if API key exists
+  useEffect(() => {
+    const hasKey = hasApiKey();
+    
+    if (!hasKey) {
+      setShowApiKeyPrompt(true);
+    }
+  }, [hasApiKey]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -352,42 +364,38 @@ const ChatInterface: React.FC = () => {
     scrollToBottom();
   }, [currentConversation?.messages]);
 
-  const handleSend = async () => {
-    if (!input.trim() || isStreaming) return;
-
-    const message = input;
-    setInput("");
-    setIsTyping(true);
-
-    try {
-      await sendMessage(message);
-    } catch (error) {
-      console.error("Error sending message:", error);
-    } finally {
-      setIsTyping(false);
+  const handleSendMessage = async (content: string, attachments?: any[]) => {
+    // Check if API key exists before sending
+    const hasKey = hasApiKey();
+    
+    if (!hasKey) {
+      setShowApiKeyPrompt(true);
+      return;
     }
 
-    inputRef.current?.focus();
-  };
-
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      handleSend();
+    try {
+      await sendMessage(content, attachments);
+    } catch (error) {
+      console.error("Error sending message:", error);
     }
   };
 
   return (
     <div className="flex-1 flex flex-col h-full">
+      {/* API Key Prompt */}
+      {showApiKeyPrompt && (
+        <ApiKeyPrompt onApiKeySet={() => setShowApiKeyPrompt(false)} />
+      )}
+
       {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto px-4 py-6 space-y-4">
+      <div className="flex-1 overflow-y-auto px-2 sm:px-4 py-4 sm:py-6 space-y-3 sm:space-y-4">
         {!currentConversation || currentConversation.messages.length === 0 ? (
           <div className="h-full flex items-center justify-center">
             <div className="text-center max-w-2xl px-4">
-              <div className="mb-8">
-                <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-primary-500 to-purple-600 rounded-3xl flex items-center justify-center anime-glow float-animation">
+              <div className="mb-6 sm:mb-8">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-4 sm:mb-6 bg-gradient-to-br from-primary-500 to-purple-600 rounded-3xl flex items-center justify-center anime-glow float-animation">
                   <svg
-                    className="w-10 h-10"
+                    className="w-8 h-8 sm:w-10 sm:h-10"
                     fill="currentColor"
                     viewBox="0 0 20 20"
                   >
@@ -395,15 +403,15 @@ const ChatInterface: React.FC = () => {
                     <path d="M15 7v2a4 4 0 01-4 4H9.828l-1.766 1.767c.28.149.599.233.938.233h2l3 3v-3h2a2 2 0 002-2V9a2 2 0 00-2-2h-1z" />
                   </svg>
                 </div>
-                <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-primary-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-3 sm:mb-4 bg-gradient-to-r from-primary-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
                   Welcome to MAG AI
                 </h1>
-                <p className="text-gray-400 text-lg">
+                <p className="text-gray-400 text-base sm:text-lg">
                   Your powerful AI assistant. Ask me anything!
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-left">
                 {[
                   {
                     icon: "💡",
@@ -428,18 +436,18 @@ const ChatInterface: React.FC = () => {
                 ].map((feature, idx) => (
                   <div
                     key={idx}
-                    className="p-4 rounded-xl bg-gradient-to-br from-white/5 to-white/10 border border-white/10 hover:border-primary-500/50 transition-all hover:transform hover:-translate-y-1"
+                    className="p-3 sm:p-4 rounded-xl bg-gradient-to-br from-white/5 to-white/10 border border-white/10 hover:border-primary-500/50 transition-all hover:transform hover:-translate-y-1"
                   >
-                    <div className="text-3xl mb-2">{feature.icon}</div>
-                    <h3 className="font-semibold mb-1">{feature.title}</h3>
-                    <p className="text-sm text-gray-400">{feature.desc}</p>
+                    <div className="text-2xl sm:text-3xl mb-2">{feature.icon}</div>
+                    <h3 className="font-semibold mb-1 text-sm sm:text-base">{feature.title}</h3>
+                    <p className="text-xs sm:text-sm text-gray-400">{feature.desc}</p>
                   </div>
                 ))}
               </div>
 
               {/* Creator Credits */}
-              <div className="mt-8 text-center">
-                <p className="text-sm text-gray-400">
+              <div className="mt-6 sm:mt-8 text-center">
+                <p className="text-xs sm:text-sm text-gray-400">
                   Created by{" "}
                   <a
                     href="https://www.instagram.com/sufiyanjahagirdar?utm_source=qr&igsh=MWpwdmJ6bHBybHVleg=="
@@ -480,59 +488,30 @@ const ChatInterface: React.FC = () => {
       </div>
 
       {/* Input Area */}
-      <div className="border-t border-white/10 p-4 bg-dark-900/50 backdrop-blur-sm">
-        <div className="max-w-4xl mx-auto">
-          <div className="relative">
-            <textarea
-              ref={inputRef}
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyPress={handleKeyPress}
-              placeholder="Message MAG AI..."
-              rows={1}
-              className="w-full px-4 py-4 pr-12 bg-white/5 border border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary-500 resize-none"
-              style={{ minHeight: "56px", maxHeight: "200px" }}
-            />
-            <button
-              onClick={handleSend}
-              disabled={!input.trim() || isStreaming}
-              className={`absolute right-2 bottom-2 p-3 rounded-xl transition-all ${
-                input.trim() && !isStreaming
-                  ? "bg-gradient-to-r from-primary-500 to-purple-600 hover:from-primary-600 hover:to-purple-700 text-white shadow-lg"
-                  : "bg-white/5 text-gray-500 cursor-not-allowed"
-              }`}
-            >
-              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
-              </svg>
-            </button>
-          </div>
-          <div className="text-center space-y-1">
-            <p className="text-xs text-gray-500">
-              Press Enter to send, Shift+Enter for new line
-            </p>
-            <p className="text-xs text-gray-400">
-              Made by{" "}
-              <a
-                href="https://www.instagram.com/sufiyanjahagirdar?utm_source=qr&igsh=MWpwdmJ6bHBybHVleg=="
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-primary-400 hover:text-primary-300 transition-colors font-medium"
-              >
-                Abusufiyan Jahagirdar
-              </a>
-            </p>
-          </div>
-        </div>
-      </div>
+      <ChatInput
+        onSendMessage={handleSendMessage}
+        disabled={isStreaming}
+        placeholder="Message MAG AI with files..."
+        maxFiles={5}
+        maxFileSize={10 * 1024 * 1024} // 10MB
+      />
     </div>
   );
 };
 
 // Main App Component
 const AppContent: React.FC = () => {
-  const { createConversation } = useChat();
+  const { createConversation, hasApiKey, setApiKey } = useChat();
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [showApiKeyModal, setShowApiKeyModal] = useState(false);
+
+  // Check if API key exists on mount
+  useEffect(() => {
+    // Check if we have an API key
+    if (!hasApiKey()) {
+      setShowApiKeyModal(true);
+    }
+  }, [hasApiKey]);
 
   useEffect(() => {
     // Animated background particles
@@ -596,14 +575,25 @@ const AppContent: React.FC = () => {
         className="absolute inset-0 opacity-20 pointer-events-none"
       />
 
+      {/* API Key Modal */}
+      <ApiKeyModal
+        isOpen={showApiKeyModal}
+        onSave={(key) => {
+          setApiKey(key);
+          setShowApiKeyModal(false);
+        }}
+        onClose={() => setShowApiKeyModal(false)}
+      />
+
       {/* Header */}
-      <div className="absolute top-0 left-0 right-0 z-30 flex items-center justify-between p-4 bg-dark-900/50 backdrop-blur-sm border-b border-white/10">
-        <div className="flex items-center gap-4">
+      <div className="absolute top-0 left-0 right-0 z-30 flex items-center justify-between p-3 sm:p-4 bg-dark-900/50 backdrop-blur-sm border-b border-white/10">
+        <div className="flex items-center gap-2 sm:gap-4">
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="lg:hidden p-2 hover:bg-white/10 rounded-lg transition-colors"
+            className="lg:hidden p-2 hover:bg-white/10 rounded-lg transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
+            aria-label="Toggle menu"
           >
-            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+            <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" viewBox="0 0 20 20">
               <path
                 fillRule="evenodd"
                 d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"
@@ -611,7 +601,7 @@ const AppContent: React.FC = () => {
               />
             </svg>
           </button>
-          <h1 className="text-xl font-bold bg-gradient-to-r from-primary-400 to-purple-400 bg-clip-text text-transparent">
+          <h1 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-primary-400 to-purple-400 bg-clip-text text-transparent">
             MAG AI
           </h1>
         </div>
@@ -620,26 +610,26 @@ const AppContent: React.FC = () => {
             onClick={() => {
               createConversation();
             }}
-            className="hidden sm:flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-primary-500 to-purple-600 hover:from-primary-600 hover:to-purple-700 rounded-lg font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200"
+            className="hidden sm:flex items-center gap-2 px-3 py-2 lg:px-4 lg:py-2 bg-gradient-to-r from-primary-500 to-purple-600 hover:from-primary-600 hover:to-purple-700 rounded-lg font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200"
             title="Start a new chat"
           >
-            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+            <svg className="w-4 h-4 lg:w-5 lg:h-5" fill="currentColor" viewBox="0 0 20 20">
               <path
                 fillRule="evenodd"
                 d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
                 clipRule="evenodd"
               />
             </svg>
-            <span>New Chat</span>
+            <span className="hidden lg:inline">New Chat</span>
           </button>
           <button
             onClick={() => {
               createConversation();
             }}
-            className="sm:hidden p-2 hover:bg-white/10 rounded-lg transition-colors"
+            className="sm:hidden p-2 hover:bg-white/10 rounded-lg transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
             title="New chat"
           >
-            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
               <path
                 fillRule="evenodd"
                 d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
@@ -654,7 +644,7 @@ const AppContent: React.FC = () => {
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
       {/* Main Chat Area */}
-      <div className="flex-1 flex flex-col pt-16">
+      <div className="flex-1 flex flex-col lg:pt-16 pt-16">
         <ChatInterface />
       </div>
     </div>

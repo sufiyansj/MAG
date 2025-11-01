@@ -52,3 +52,4 @@ A professional, feature-rich AI chat application with beautiful animations, pers
 - **Your AI Provider API Key**
 
 # MAG
+# MAG

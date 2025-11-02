@@ -50,7 +50,7 @@ const Sidebar: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
       {/* Sidebar */}
       <animated.div
         style={sidebarSpring}
-        className="fixed lg:relative top-0 left-0 h-full w-80 lg:w-80 md:w-72 sm:w-72 xs:w-80 bg-gradient-to-br from-dark-900 via-dark-800 to-dark-900 border-r border-white/10 z-50 flex flex-col lg:translate-x-0"
+        className="fixed lg:relative top-0 left-0 h-full w-80 lg:w-80 md:w-72 sm:w-80 bg-gradient-to-br from-dark-900 via-dark-800 to-dark-900 border-r border-white/10 z-50 flex flex-col lg:translate-x-0 overflow-y-auto overflow-x-hidden mobile-sidebar"
       >
         {/* Header */}
         <div className="p-4 border-b border-white/10">
@@ -60,7 +60,7 @@ const Sidebar: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
             </h2>
             <button
               onClick={onClose}
-              className="lg:hidden p-2 hover:bg-white/10 rounded-lg transition-colors"
+              className="lg:hidden p-2 hover:bg-white/10 rounded-lg transition-colors mobile-tap-safe no-select"
             >
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                 <path
@@ -77,7 +77,7 @@ const Sidebar: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
               createConversation();
               onClose();
             }}
-            className="w-full py-3 px-4 bg-gradient-to-r from-primary-500 to-purple-600 hover:from-primary-600 hover:to-purple-700 rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center gap-2"
+            className="w-full py-3 px-4 bg-gradient-to-r from-primary-500 to-purple-600 hover:from-primary-600 hover:to-purple-700 rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center gap-2 mobile-tap-safe no-select"
           >
             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
               <path
@@ -113,7 +113,7 @@ const Sidebar: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
         </div>
 
         {/* Conversations List */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-2">
+        <div className="flex-1 overflow-y-auto overflow-x-hidden p-4 space-y-2 scrollbar-thin scrollbar-thumb-primary-500/20 scrollbar-track-transparent scrollable-list">
           {pinnedConversations.length > 0 && (
             <div className="mb-4">
               <h3 className="text-xs font-semibold text-gray-400 mb-2">
@@ -170,8 +170,8 @@ const Sidebar: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
         </div>
 
         {/* Clear Confirmation Modal */}
-        {showClearConfirm && (
-          <div className="absolute inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          {showClearConfirm && (
+            <div className="absolute inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-[60]">
             <div className="bg-dark-800 rounded-xl p-6 max-w-sm w-full border border-white/10">
               <h3 className="text-lg font-bold mb-2">
                 Clear All Conversations?
@@ -287,7 +287,7 @@ const ConversationItem: React.FC<{
 
       {/* Context Menu */}
       {showMenu && (
-        <div className="absolute right-0 top-8 w-48 bg-dark-800 border border-white/10 rounded-lg shadow-xl z-10 py-1">
+        <div className="absolute right-0 top-8 w-48 bg-dark-800 border border-white/10 rounded-lg shadow-xl z-[55] py-1">
           <button
             onClick={() => {
               setIsEditing(true);
@@ -590,7 +590,7 @@ const AppContent: React.FC = () => {
         <div className="flex items-center gap-2 sm:gap-4">
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="lg:hidden p-2 hover:bg-white/10 rounded-lg transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
+            className="lg:hidden p-2 hover:bg-white/10 rounded-lg transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center mobile-tap-safe no-select"
             aria-label="Toggle menu"
           >
             <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" viewBox="0 0 20 20">
@@ -610,7 +610,7 @@ const AppContent: React.FC = () => {
             onClick={() => {
               createConversation();
             }}
-            className="hidden sm:flex items-center gap-2 px-3 py-2 lg:px-4 lg:py-2 bg-gradient-to-r from-primary-500 to-purple-600 hover:from-primary-600 hover:to-purple-700 rounded-lg font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200"
+            className="hidden sm:flex items-center gap-2 px-3 py-2 lg:px-4 lg:py-2 bg-gradient-to-r from-primary-500 to-purple-600 hover:from-primary-600 hover:to-purple-700 rounded-lg font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 mobile-tap-safe no-select"
             title="Start a new chat"
           >
             <svg className="w-4 h-4 lg:w-5 lg:h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -626,7 +626,7 @@ const AppContent: React.FC = () => {
             onClick={() => {
               createConversation();
             }}
-            className="sm:hidden p-2 hover:bg-white/10 rounded-lg transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
+            className="sm:hidden p-2 hover:bg-white/10 rounded-lg transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center mobile-tap-safe no-select"
             title="New chat"
           >
             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">

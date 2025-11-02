@@ -658,6 +658,36 @@ pre {
     * {
         -webkit-overflow-scrolling: touch;
     }
+
+    /* Mobile-optimized sidebar */
+    .mobile-sidebar {
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior: contain;
+        scroll-behavior: smooth;
+    }
+
+    /* Better touch scrolling for lists */
+    .scrollable-list {
+        scroll-behavior: smooth;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior-y: contain;
+    }
+
+    /* Prevent text selection on mobile for UI elements */
+    .no-select {
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        -webkit-touch-callout: none;
+    }
+
+    /* Mobile-safe tap area */
+    .mobile-tap-safe {
+        min-height: 44px;
+        min-width: 44px;
+        touch-action: manipulation;
+    }
 }
 
 /* ==================== PERFORMANCE OPTIMIZATIONS ==================== */

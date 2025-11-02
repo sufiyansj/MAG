@@ -37,6 +37,22 @@
                 height: 100%;
                 overflow: hidden;
             }
+            
+            /* Set CSS custom property for fallback */
+            html {
+                --vh: 1vh;
+            }
+            
+            /* JavaScript viewport height fix for older browsers */
+            @supports not (height: 100dvh) {
+                html {
+                    height: 100vh;
+                }
+                
+                body {
+                    height: 100vh;
+                }
+            }
 
             body {
                 font-family:
@@ -247,6 +263,20 @@
                     }
                 }, 1000);
             });
+        </script>
+        
+        <!-- Mobile viewport height fix -->
+        <script>
+            // Fix for mobile viewport height issues
+            function setMobileVH() {
+                const vh = window.innerHeight * 0.01;
+                document.documentElement.style.setProperty('--vh', `${vh}px`);
+            }
+            
+            // Set on load and resize
+            setMobileVH();
+            window.addEventListener('resize', setMobileVH);
+            window.addEventListener('orientationchange', setMobileVH);
         </script>
     </body>
 </html>

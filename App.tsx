@@ -568,7 +568,7 @@ const AppContent: React.FC = () => {
   }, []);
 
   return (
-    <div className="flex h-screen bg-gradient-to-br from-dark-950 via-dark-900 to-dark-950 text-white overflow-hidden relative">
+    <div className="flex min-h-screen h-dvh bg-gradient-to-br from-dark-950 via-dark-900 to-dark-950 text-white overflow-hidden relative">
       {/* Animated Background */}
       <canvas
         id="particles"

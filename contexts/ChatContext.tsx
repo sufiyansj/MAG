@@ -131,7 +131,7 @@ class APIServiceAdapter {
 const apiAdapter = new APIServiceAdapter();
 
 const DEFAULT_SETTINGS: ConversationSettings = {
-  model: "minimax/minimax-m2:free",
+  model: "openrouter/polaris-alpha",
   temperature: 2.0,
   maxTokens: 32768,
   systemPrompt:

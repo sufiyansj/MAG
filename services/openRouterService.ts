@@ -23,7 +23,7 @@ export interface OpenRouterModel {
 class OpenRouterAPIService {
   private apiKey: string = (import.meta as any).env?.VITE_OPENROUTER_API_KEY || '';
   private baseURL: string = 'https://openrouter.ai/api/v1';
-  private defaultModel: string = 'minimax/minimax-m2:free';
+  private defaultModel: string = 'openrouter/polaris-alpha';
   private availableModels: OpenRouterModel[] = [];
 
   constructor() {

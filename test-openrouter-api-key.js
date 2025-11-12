@@ -13,7 +13,7 @@ async function testOpenRouterAPI() {
         'X-Title': 'Grok Chat App',
       },
       body: JSON.stringify({
-        model: 'minimax/minimax-m2:free',
+        model: 'openrouter/polaris-alpha',
         messages: [
           {
             role: 'user',

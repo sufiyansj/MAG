@@ -23,7 +23,7 @@ export interface OpenRouterModel {
 class OpenRouterAPIService {
   private apiKey: string = (import.meta as any).env?.VITE_OPENROUTER_API_KEY || '';
   private baseURL: string = 'https://openrouter.ai/api/v1';
-  private defaultModel: string = 'openrouter/polaris-alpha';
+  private defaultModel: string = 'nvidia/nemotron-nano-12b-v2-vl:free';
   private availableModels: OpenRouterModel[] = [];
 
   constructor() {

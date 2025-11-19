@@ -131,7 +131,7 @@ class APIServiceAdapter {
 const apiAdapter = new APIServiceAdapter();
 
 const DEFAULT_SETTINGS: ConversationSettings = {
-  model: "openrouter/polaris-alpha",
+  model: "nvidia/nemotron-nano-12b-v2-vl:free",
   temperature: 2.0,
   maxTokens: 32768,
   systemPrompt:

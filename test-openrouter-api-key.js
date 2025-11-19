@@ -13,7 +13,7 @@ async function testOpenRouterAPI() {
         'X-Title': 'Grok Chat App',
       },
       body: JSON.stringify({
-        model: 'openrouter/polaris-alpha',
+        model: 'nvidia/nemotron-nano-12b-v2-vl:free',
         messages: [
           {
             role: 'user',
